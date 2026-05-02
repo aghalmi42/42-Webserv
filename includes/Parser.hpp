@@ -9,6 +9,7 @@
 #include <fstream>
 #include <cstdlib>
 #include <sstream>
+#include "utils.hpp"
 
 class Parser
 {
