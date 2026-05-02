@@ -7,11 +7,15 @@
 #include <vector>
 #include "ServerConfig.hpp"
 #include <fstream>
+#include <cstdlib>
+#include <sstream>
 
 class Parser
 {
     private:
     std::string _configPath;
+    Server parserServer(std::ifstream& readLine);
+    Location parserLocation(std::ifstream& readLine, std::string pathLocation);
 
     public:
     Parser(std::string configPath);

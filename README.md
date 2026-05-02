@@ -17,3 +17,5 @@ Webserv for 42
 -https://en.wikipedia.org/wiki/Common_Gateway_Interface
 
 -https://blog.stephane-robert.info/docs/services/web/nginx/
+
+https://mondedie.fr/d/9343-comment-bien-configurer-les-location-nginx

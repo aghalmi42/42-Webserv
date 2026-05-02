@@ -1,12 +1,14 @@
 
 NAME = webserv
 
-SRCS = srcs/
+SRCS = srcs/main.cpp \
+	   srcs/parsing/Parser.cpp
 	   
 
 OBJS = $(SRCS:.cpp=.o)
 
-INCLUDES = includes/
+INCLUDES = includes/Parser.hpp \
+		   includes/ServerConfig.hpp
 
 CC = c++
 CFLAGS = -Wall -Wextra -Werror -std=c++98 -g3 -I includes

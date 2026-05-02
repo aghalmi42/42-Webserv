@@ -22,4 +22,3 @@ FastCGI :
 Fast Common Gateway Interface est un protocole de communication qui améliore les performances des applications web 
 en maintenant des processus persistants pour traiter plusieurs requêtes au lieu de redémarrer un nouveau processus à chaque fois.
 
-

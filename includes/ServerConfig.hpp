@@ -12,10 +12,11 @@ struct Location
     std::vector<std::string> methodHttp;
     std::string root;
     std::string redirection;
-    std::string FileIndex;
+    std::string fileIndex;
     bool autoIndex;
     std::string uploadPath;
-    std::string ExtensionCgi;
+    std::string extensionCgi;
+    std::string path;
 };
 
 struct Server
