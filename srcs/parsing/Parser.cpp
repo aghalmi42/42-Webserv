@@ -3,7 +3,6 @@
 
 Parser::Parser(std::string configPath) : _configPath(configPath) 
 {
-
 }
 
 Parser::~Parser()
