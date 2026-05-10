@@ -14,6 +14,8 @@
 #include <algorithm>
 #include <unistd.h>
 #include "Routing.hpp"
+#include <sstream>
+#include <fstream>
 
 class ServerNetwork
 {
@@ -24,6 +26,7 @@ class ServerNetwork
     std::vector<struct pollfd> _fds;
     void handleClient(int fd);
     void removeClient(int fd);
+    std::string getFile(Location loc, std::string url);
     
 
     public:

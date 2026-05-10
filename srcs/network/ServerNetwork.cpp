@@ -107,10 +107,19 @@ void ServerNetwork::handleClient(int fd)
     }
     else
     {
+        std::string request = std::string(buff, handleFd);
+        size_t first = request.find(" ");
+        size_t begin = first + 1;
+        size_t end = request.find(" ", begin);
+        std::string url = request.substr(begin, end - begin);
+
         Routing router;
         Location loc = router.traitement(std::string(buff, handleFd), _server[0]);
-        std::cout << std::string(buff, handleFd) << std::endl;
-        std::string response = "HTTP/1.1 200 OK\r\nContent-Length: 12\r\n\r\nHello World!";
+        std::string body = getFile(loc, url);
+        std::stringstream ss;
+        ss << body.size();
+        std::string contentLen = ss.str();
+        std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + contentLen + "\r\n\r\n" + body;
         send(fd, response.c_str(), response.size(), 0);
     }
 }
@@ -128,4 +137,20 @@ void ServerNetwork::removeClient(int fd)
             }
             it++;
         }
+}
+
+std::string ServerNetwork::getFile(Location loc, std::string url)
+{
+    std::string filePath = loc.root + url;
+    if (url == "/")
+        filePath = loc.root + "/" + loc.fileIndex;
+    std::ifstream openFile(filePath.c_str());
+    if (!openFile.is_open())
+    {
+        std::cerr << "Error: could not open file"<< std::endl;
+        return ("");
+    }
+    std::stringstream ss;
+    ss << openFile.rdbuf();
+    return (ss.str());
 }
