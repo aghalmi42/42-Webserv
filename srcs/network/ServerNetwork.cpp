@@ -43,4 +43,89 @@ void ServerNetwork::run()
             return ;
         it++;
     }
+    std::vector<int>::iterator itt = _socket.begin();
+    while(itt != _socket.end())
+    {
+        struct pollfd pfd;
+        pfd.events = POLLIN;
+        pfd.revents = 0;
+        pfd.fd = *itt;
+        this->_fds.push_back(pfd);
+        itt++;
+    }
+    while(true)
+    {
+        int returN = poll(this->_fds.data(), this->_fds.size(), -1);
+        if (returN == -1)
+            return ;
+        std::vector<struct pollfd>::iterator itfd = this->_fds.begin();
+        while(itfd != this->_fds.end())
+        {
+            if (itfd->revents & POLLIN)
+            {
+                if (std::find(_socket.begin(), _socket.end(), itfd->fd) != _socket.end())
+                {
+                    acceptClient(itfd->fd);
+                    break ;
+                }
+                else
+                {
+                    handleClient(itfd->fd);
+                    break ;
+                }
+            }
+            itfd++;
+        }
+    }
+}
+
+void ServerNetwork::acceptClient(int fd)
+{
+    struct sockaddr_in client;
+    socklen_t len = sizeof(client);
+    int clientFd = accept(fd, (struct sockaddr*)&client, &len);
+    if (clientFd == -1)
+        return ;
+    fcntl(clientFd, F_SETFL, O_NONBLOCK);
+    struct pollfd pfd;
+    pfd.fd = clientFd;
+    pfd.events = POLLIN;
+    pfd.revents = 0;
+    this->_fds.push_back(pfd);
+}
+
+void ServerNetwork::handleClient(int fd)
+{
+    char buff[4096];
+    ssize_t handleFd = recv(fd, buff, sizeof(buff), 0);
+    if (handleFd == 0)
+        removeClient(fd);
+    else if (handleFd == -1)
+    {
+        std::cerr << "Error: recv" << std::endl;
+        removeClient(fd);
+    }
+    else
+    {
+        Routing router;
+        Location loc = router.traitement(std::string(buff, handleFd), _server[0]);
+        std::cout << std::string(buff, handleFd) << std::endl;
+        std::string response = "HTTP/1.1 200 OK\r\nContent-Length: 12\r\n\r\nHello World!";
+        send(fd, response.c_str(), response.size(), 0);
+    }
+}
+
+void ServerNetwork::removeClient(int fd)
+{
+    close(fd);
+        std::vector<struct pollfd>::iterator it = _fds.begin();
+        while(it != _fds.end())
+        {
+            if (it->fd == fd)
+            {
+                _fds.erase(it);
+                break ;
+            }
+            it++;
+        }
 }

@@ -38,3 +38,8 @@ https://www.gta.ufrj.br/ensino/eel878/sockets/sockaddr_inman.html
 https://pubs.opengroup.org/onlinepubs/009695399/functions/bind.html#:~:text=The%20bind()%20function%20shall,only%20by%20their%20address%20family.
 
 https://learn.microsoft.com/fr-fr/windows/win32/api/winsock2/nf-winsock2-listen
+
+https://man7.org/linux/man-pages/man2/poll.2.html
+
+https://www.reddit.com/r/C_Programming/comments/eeqi8r/understanding_how_to_use_poll_in_socket/?tl=fr
+
