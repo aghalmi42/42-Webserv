@@ -1,0 +1,24 @@
+Doc :
+
+RFC :
+Requests for comments. C'est un document technique qui décrit un standard, un protocole ou une méthode liée a Internet, 
+ça permet au professionnel de l'informatique d'utiliser les mêmes standards à l'échelle mondiale. 
+Pour HTPP elles décrivent les actions qu'un client et un serveur doivent effectuer pour échanger des requêtes et des réponses de manière à approprier pour chaque version du protocole HTPP.
+
+HTTP :
+HyperText Transfer Protocol est un protocole qui permet de transmettre des documents hypermédias ou des pages HTML. 
+Il est connu pour la communication entre le navigateur web et les serveurs web mais il peut également s'utiliser dans d'autres contextes. 
+HTTP suit un modèle classique Client-serveur avec un client qui ouvre une connexion pour effectuer une requête puis attend jusqu'à ce qu'elle reçoive une réponse du serveur. 
+HTTP est un protocole sans état, cela signifie qu'il ne conserve aucune donnée de sessions entre deux requêtes.
+
+Telnet :
+Telnet est un protocole qui permet de se connecter à un ordinateur à distance et d'utiliser celui-ci comme si une connexion directe avait été établie sur le réseau local.
+
+NGINX :
+NGINX est un serveur web très rapide et léger conçu pour gérer un grand nombre de connexions simultanées. 
+Il peut agir en reverse proxy pour des applications dynamiques et repartir la tache entre plusieurs serveur backend.
+
+FastCGI :
+Fast Common Gateway Interface est un protocole de communication qui améliore les performances des applications web 
+en maintenant des processus persistants pour traiter plusieurs requêtes au lieu de redémarrer un nouveau processus à chaque fois.
+
