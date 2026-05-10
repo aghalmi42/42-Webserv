@@ -43,3 +43,8 @@ https://man7.org/linux/man-pages/man2/poll.2.html
 
 https://www.reddit.com/r/C_Programming/comments/eeqi8r/understanding_how_to_use_poll_in_socket/?tl=fr
 
+https://developer.mozilla.org/fr/docs/Web/HTTP/Reference/Methods/GET
+
+https://developer.mozilla.org/fr/docs/Web/HTTP/Reference/Methods/POST
+
+https://developer.mozilla.org/fr/docs/Web/HTTP/Reference/Methods/DELETE

@@ -112,15 +112,33 @@ void ServerNetwork::handleClient(int fd)
         size_t begin = first + 1;
         size_t end = request.find(" ", begin);
         std::string url = request.substr(begin, end - begin);
+        std::string method = request.substr(0, request.find(" "));
+        if (method == "GET")
+        {
+            Routing router;
+            Location loc = router.traitement(request, _server[0]);
+            handleGet(fd, url, loc); 
+        }
+        else if (method == "POST")
+        {
+            Routing router;
+            Location loc = router.traitement(request, _server[0]);
+            size_t start = request.find("\r\n\r\n");
+            std::string body = request.substr(start + 4);
+            handlePost(fd, url, body, loc);
+        }
+        else if (method == "DELETE")
+        {
+            Routing router;
+            Location loc = router.traitement(request, _server[0]);
+            handleDelete(fd, url, loc);
+        }
+        else
+        {
+            std::string response = "HTTP/1.1 405 Method not allowed\r\nContent-Length: 0\r\n\r\n";
+            send(fd, response.c_str(), response.size(), 0);
+        }
 
-        Routing router;
-        Location loc = router.traitement(std::string(buff, handleFd), _server[0]);
-        std::string body = getFile(loc, url);
-        std::stringstream ss;
-        ss << body.size();
-        std::string contentLen = ss.str();
-        std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + contentLen + "\r\n\r\n" + body;
-        send(fd, response.c_str(), response.size(), 0);
     }
 }
 
@@ -153,4 +171,59 @@ std::string ServerNetwork::getFile(Location loc, std::string url)
     std::stringstream ss;
     ss << openFile.rdbuf();
     return (ss.str());
+}
+
+void ServerNetwork::handleGet(int fd, std::string url, Location loc)
+{
+        std::string body = getFile(loc, url);
+        if (body.empty())
+        {
+            std::ifstream errorFile("www/404.html");
+            std::stringstream ss;
+            ss << errorFile.rdbuf();
+            std::string errorBody = ss.str();
+            std::stringstream ss2;
+            ss2 << errorBody.size();
+            std::string response = "HTTP/1.1 404 Not Found\r\nContent-Length: " + ss2.str() + "\r\n\r\n" + errorBody;
+            send(fd, response.c_str(), response.size(), 0);
+        }
+        else
+        {
+            std::stringstream ss;
+            ss << body.size();
+            std::string contentLen = ss.str();
+            std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: " + contentLen + "\r\n\r\n" + body;
+            send(fd, response.c_str(), response.size(), 0);
+        }
+}
+
+
+void ServerNetwork::handleDelete(int fd, std::string url, Location loc)
+{
+    std::string filePath = loc.root + url;
+    if (remove(filePath.c_str()) == 0)
+    {
+        std::string response = "HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n";
+        send(fd, response.c_str(), response.size(), 0);
+    }
+    else
+    {
+        std::string response = "HTTP/1.1 404 Not Found\r\nContent-Length: 0\r\n\r\n";
+        send(fd, response.c_str(), response.size(), 0);
+    }
+}
+
+void ServerNetwork::handlePost(int fd, std::string url, std::string request, Location loc)
+{
+    std::string fileName = url.substr(url.find_last_of("/") + 1);
+    std::string fileCreate = loc.uploadPath + "/" + fileName;
+    std::ofstream outFile(fileCreate.c_str());
+    if (!outFile.is_open())
+    {
+        std::cerr << "Error: could not open file" << std::endl;
+        return ;
+    }
+    outFile << request;
+    std::string response = "HTTP/1.1 201 Created\r\nContent-Length: 0\r\n\r\n";
+    send(fd, response.c_str(), response.size(), 0);
 }
