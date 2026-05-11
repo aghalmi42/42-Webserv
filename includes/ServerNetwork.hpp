@@ -16,6 +16,8 @@
 #include "Routing.hpp"
 #include <sstream>
 #include <fstream>
+#include <unistd.h>
+#include <sys/wait.h>
 
 class ServerNetwork
 {
@@ -30,6 +32,7 @@ class ServerNetwork
     void handleGet(int fd, std::string url, Location loc);
     void handleDelete(int fd, std::string url, Location loc);
     void handlePost(int fd, std::string url, std::string request, Location loc);
+    void executeCgi(int fd, std::string url, Location loc, std::string request);
 
     public:
     ServerNetwork(std::vector<Server> server);
