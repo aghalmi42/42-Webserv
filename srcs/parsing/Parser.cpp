@@ -46,8 +46,8 @@ Server Parser::parserServer(std::ifstream& readLine)
     while(std::getline(readLine, line))
     {
         line = strTrim(line);
-        if (line == "}")
-            break ;
+         if (line == "}")
+           break ;
         if (line[0] == '#')
             continue ;
         if (line.find("listen") != std::string::npos)
