@@ -57,7 +57,7 @@ std::string Response::_CreateResponse(int code, const std::string& body)
     else status = "500 Internal Server Error";
 
     std::ostringstream res;
-    res << "/1.1 " << status << "\r\n";
+    res << "HTTP/1.1 " << status << "\r\n";
     res << "Content-Type: text/html\r\n";
     res << "Content-Length: " << body.size() << "\r\n";
     res << "\r\n";   // ligne vide obligatoire
