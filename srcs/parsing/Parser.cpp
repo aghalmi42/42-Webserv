@@ -50,6 +50,7 @@ Server Parser::parserServer(std::ifstream& readLine)
            break ;
         if (line[0] == '#')
             continue ;
+        //adel : fait attention t'as pas verif si la ligne elle est vide ou pas avant de faire les find ca peut faire crash si la ligne est vide
         if (line.find("listen") != std::string::npos)
         {
             size_t begin = line.find("listen") + 7;
@@ -108,6 +109,7 @@ Location Parser::parserLocation(std::ifstream& readLine, std::string pathLocatio
             break ;
         if (line[0] == '#')
             continue ;
+        // Adel : Amir verifie que la line n'est pas vide sinon cv crash 
         if (line.find("methods") != std::string::npos)
         {
             size_t begin = line.find("methods") + 8;

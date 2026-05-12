@@ -15,7 +15,13 @@ class Response
 		std::string _methode;
 		std::string _path;
 		std::string _response;
+		std::string _version;
+		std::string _body;
 		Server		_server;
+		std::map<std::string, std::string> _headers; //dictionare clef valeur ;
+
+	//note a moi meme si je rajoute une class prive pas oublier de lajouter dans 
+	// l'operateur de recopie 
 
 		void  _parseRequest(const std::string& raw);
 		std::string _readFile(const std::string& file);
