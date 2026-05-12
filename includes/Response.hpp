@@ -7,7 +7,7 @@
 #include <fstream> // pr ouvrir des fichier sur le disque
 #include <sstream> // pour construire une string moreau par moreau
 #include "ServerConfig.hpp"
-
+#include "utils.hpp"
 
 class Response
 {
@@ -18,6 +18,7 @@ class Response
 		std::string _version;
 		std::string _body;
 		Server		_server;
+		Location 	_location;
 		std::map<std::string, std::string> _headers; //dictionare clef valeur ;
 
 	//note a moi meme si je rajoute une class prive pas oublier de lajouter dans 
@@ -29,7 +30,7 @@ class Response
 		std::string _ErrorPageResponse(int code);
 
 	public:
-		Response(const std::string& request,const Server& config);
+		Response(const std::string& request,const Server& config,const Location& location);
 		Response(const Response& src);
 		Response& operator=(const Response& src);
 		~Response();
@@ -41,6 +42,18 @@ class Response
 
 //std ostream a add jsais pu la commander aller chercher sur les ancien cpp
 
+// GET /index.html HTTP/1.1\r\n
+// Host: localhost:8080\r\n
+// User-Agent: Mozilla/5.0\r\n
+// Accept: text/html\r\n
+// \r\n
 
+
+// POST /upload HTTP/1.1\r\n
+// Host: localhost:8080\r\n
+// Content-Type: text/plain\r\n
+// Content-Length: 13\r\n
+// \r\n
+// hello world !
 
 #endif
