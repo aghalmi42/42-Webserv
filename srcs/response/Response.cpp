@@ -113,9 +113,18 @@ std::string Response::_ErrorPageResponse(int code)
 
 int Response::ArgsVerif()
 {
+	std::vector<std::string>::iterator it = std::find
+	(_location.methodHttp.begin(),
+	_location.methodHttp.end(),
+	_methode);
 	if(_path.empty() || _methode.empty() || _version.empty())
 	{
 		_response = _ErrorPageResponse(400);
+		return 1;
+	}
+	if(it == _location.methodHttp.end())
+	{
+		_response = _ErrorPageResponse(405);
 		return 1;
 	}
 	if(_version != "HTTP/1.1")
@@ -123,11 +132,7 @@ int Response::ArgsVerif()
 		_response = _ErrorPageResponse(505);
 		return 1;
 	}
-	//vérifier si _methode est dans _location.methodHttp avant de traiter la requête
-	// 405 location — encore pas fait. 
-	//Dans build() après ArgsVerif(), 
-	// _methode est dans _location.methodHttp avec std::find.
-	//todo next error potential
+	
 	return 0;
 }
 void Response::build()
@@ -149,13 +154,14 @@ void Response::build()
 	}
 	else if(_methode == "POST")
 	{
-		std::string fileName = _path.substr(_path.find_last_of("/") + 1);
-		std::ofstream outfile(_location.uploadPath + "/" + fileName);
 		if((long)_body.size() > _server.MaxSizeClient)
 		{
 			_response = _ErrorPageResponse(413);
 			return ;
 		}
+		std::string fileName = _path.substr(_path.find_last_of("/") + 1);
+		std::ofstream outfile(_location.uploadPath + "/" + fileName);
+		
 		if(!outfile.is_open())
 			_response = _ErrorPageResponse(404);
 		else

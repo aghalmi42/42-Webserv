@@ -8,6 +8,7 @@
 #include <sstream> // pour construire une string moreau par moreau
 #include "ServerConfig.hpp"
 #include "utils.hpp"
+#include <algorithm>
 
 class Response
 {
