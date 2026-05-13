@@ -36,6 +36,8 @@ class Response
 		~Response();
 
 		void build();
+		int Response::ArgsVerif();
+
 		std::string get() const;
 
 };

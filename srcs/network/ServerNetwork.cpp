@@ -145,8 +145,6 @@ void ServerNetwork::handleClient(int fd)
         //     std::string response = "HTTP/1.1 405 Method not allowed\r\nContent-Length: 0\r\n\r\n";
         //     send(fd, response.c_str(), response.size(), 0);
         // }
-	
-
     }
 }
 

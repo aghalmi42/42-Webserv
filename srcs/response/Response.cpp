@@ -77,8 +77,9 @@ std::string Response::_readFile(const std::string& filepath)
 std::string Response::_CreateResponse(int code, const std::string& body)
 {
     std::string status;
-    if (code == 200) status = "200 OK";
-	else if (code == 201) status = "201 Created";
+    if (code == 200) status = "200 OK";// new
+	else if (code == 201) status = "201 Created";// new
+	else if (code == 204) status = "204 No Content"; // new
     else if (code == 404) status = "404 Not Found";
     else if (code == 403) status = "403 Forbidden";
     else if (code == 405) status = "405 Method Not Allowed";
@@ -101,6 +102,7 @@ std::string Response::_ErrorPageResponse(int code)
     {
         std::string filepath = _server.errorPage[code];
         std::string body = _readFile("www" + filepath);
+		std::cerr << "repertoy" << "www" + filepath << std::endl;
         if (!body.empty())
             return (_CreateResponse(code, body));
     }
@@ -109,8 +111,26 @@ std::string Response::_ErrorPageResponse(int code)
     return (_CreateResponse(code, fallback.str()));
 }
 
+int Response::ArgsVerif()
+{
+	if(_path.empty() || _methode.empty() || _version.empty())
+	{
+		_response = _ErrorPageResponse(400);
+		return 1;
+	}
+	if(_version != "HTTP/1.1")
+	{
+		_response = _ErrorPageResponse(505);
+		return 1;
+	}
+	//todo next error potential
+	return 0;
+}
 void Response::build()
 {
+	if(ArgsVerif() == 1)
+		return;	
+	
 	if(_methode == "GET")
 	{
 		if (_path == "/")
@@ -127,6 +147,11 @@ void Response::build()
 	{
 		std::string fileName = _path.substr(_path.find_last_of("/") + 1);
 		std::ofstream outfile(_location.uploadPath + "/" + fileName);
+		if((long)_body.size() > _server.MaxSizeClient)
+		{
+			_response = _ErrorPageResponse(413);
+			return ;
+		}
 		if(!outfile.is_open())
 			_response = _ErrorPageResponse(404);
 		else
@@ -140,7 +165,7 @@ void Response::build()
 		std::string FileName = _path.substr(_path.find_last_of("/") + 1);
 		std::string FilePath = _location.root + _path; 
 		if(remove(FilePath.c_str()) == 0)
-			_response = _CreateResponse(200 ,"");
+			_response = _CreateResponse(204 ,"");
 		else
 			_response = _ErrorPageResponse(404);
 	}
