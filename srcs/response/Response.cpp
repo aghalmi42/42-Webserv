@@ -123,6 +123,10 @@ int Response::ArgsVerif()
 		_response = _ErrorPageResponse(505);
 		return 1;
 	}
+	//vérifier si _methode est dans _location.methodHttp avant de traiter la requête
+	// 405 location — encore pas fait. 
+	//Dans build() après ArgsVerif(), 
+	// _methode est dans _location.methodHttp avec std::find.
 	//todo next error potential
 	return 0;
 }
