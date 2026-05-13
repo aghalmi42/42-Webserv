@@ -9,7 +9,8 @@
 #include "ServerConfig.hpp"
 #include "utils.hpp"
 #include <algorithm>
-
+#include <unistd.h> 
+#include <sys/wait.h>
 class Response
 {
 	private:
@@ -18,6 +19,7 @@ class Response
 		std::string _response;
 		std::string _version;
 		std::string _body;
+		std::string _executeCgi();
 		Server		_server;
 		Location 	_location;
 		std::map<std::string, std::string> _headers; //dictionare clef valeur ;
@@ -37,8 +39,7 @@ class Response
 		~Response();
 
 		void build();
-		int Response::ArgsVerif();
-
+		int ArgsVerif();
 		std::string get() const;
 
 };

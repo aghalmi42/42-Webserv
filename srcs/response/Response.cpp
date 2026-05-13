@@ -135,17 +135,91 @@ int Response::ArgsVerif()
 	
 	return 0;
 }
+
+
+std::string Response::_executeCgi()
+{
+	int pipefd[2];
+	if(pipe(pipefd) == -1)
+	{
+		std::cerr << "Error: pipe failed" << std::endl;
+		return ("");
+	}
+	char buff[4096];
+	pid_t pid = fork();
+	if (pid == -1)
+	{
+		std::cerr << "Error: fork failed" << std::endl;
+		return ("");
+	}
+	if(pid == 0)
+	{
+		dup2(pipefd[1], STDOUT_FILENO);
+		close(pipefd[0]);
+		close(pipefd[1]);
+		std::string scriptPath = _location.root + _path;
+		char *arg[3];
+		arg[0] = (char *)"/usr/bin/python3";
+		arg[1] = (char *)scriptPath.c_str();
+		arg[2] = NULL;
+		execve("/usr/bin/python3", arg, NULL);
+		exit (1);
+	}
+	else
+	{
+		close(pipefd[1]);
+		waitpid(pid, NULL, 0);
+		ssize_t octets = read(pipefd[0], buff, sizeof(buff));
+		close(pipefd[0]);
+		std::string body = std::string(buff,octets);
+		return body;
+	}
+}
+
+/*void ServerNetwork::handleGet(int fd, std::string url, Location loc)
+{
+    std::string extension = url.substr(url.find_last_of("."));
+    if (!loc.extensionCgi.empty() && extension == loc.extensionCgi)
+    {
+        executeCgi(fd, url, loc, "");
+        return ;
+    }
+    std::string body = getFile(loc, url);
+    if (body.empty())
+    {
+        std::ifstream errorFile("www/404.html");
+        std::stringstream ss;
+        ss << errorFile.rdbuf();
+        std::string errorBody = ss.str();
+        std::stringstream ss2;
+        ss2 << errorBody.size();
+        std::string response = "HTTP/1.1 404 Not Found\r\nContent-Length: " + ss2.str() + "\r\n\r\n" + errorBody;
+        send(fd, response.c_str(), response.size(), 0);
+    }
+    else
+    {
+        std::stringstream ss;
+        ss << body.size();
+        std::string contentLen = ss.str();
+        std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: " + contentLen + "\r\n\r\n" + body;
+        send(fd, response.c_str(), response.size(), 0);
+    }
+}*/
 void Response::build()
 {
 	if(ArgsVerif() == 1)
 		return;	
-	
+	size_t dotpos = _path.find_last_of(".");
+	if(dotpos != std::string::npos && !_location.extensionCgi.empty() && _path.substr(dotpos) == _location.extensionCgi)
+	{
+		_response = _CreateResponse(200,_executeCgi());
+		return ;
+	}
 	if(_methode == "GET")
 	{
 		if (_path == "/")
   		  _path = "/" + _location.fileIndex;
-		//pr test // std::cerr << "chemin: " << _location.root + _path << std::endl;
-
+		
 		std::string body = _readFile(_location.root + _path);
 		if(!body.empty())
 			_response = _CreateResponse(200,body);
