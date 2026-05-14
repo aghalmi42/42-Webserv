@@ -16,6 +16,8 @@
 #include "Routing.hpp"
 #include <sstream>
 #include <fstream>
+#include <sys/wait.h>
+#include "Response.hpp"
 
 class ServerNetwork
 {
@@ -26,10 +28,6 @@ class ServerNetwork
     std::vector<struct pollfd> _fds;
     void handleClient(int fd);
     void removeClient(int fd);
-    std::string getFile(Location loc, std::string url);
-    void handleGet(int fd, std::string url, Location loc);
-    void handleDelete(int fd, std::string url, Location loc);
-    void handlePost(int fd, std::string url, std::string request, Location loc);
 
     public:
     ServerNetwork(std::vector<Server> server);

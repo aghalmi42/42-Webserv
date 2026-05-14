@@ -5,7 +5,8 @@ SRCS = srcs/main.cpp \
 	   srcs/parsing/Parser.cpp \
 	   srcs/utils/utils.cpp \
 	   srcs/network/ServerNetwork.cpp \
-	   srcs/http/Routing.cpp
+	   srcs/http/Routing.cpp \
+	   srcs/response/Response.cpp
 	   
 
 OBJS = $(SRCS:.cpp=.o)
@@ -14,7 +15,9 @@ INCLUDES = includes/Parser.hpp \
 		   includes/ServerConfig.hpp \
 		   includes/utils.hpp \
 		   includes/ServerNetwork.hpp \
-		   includes/Routing.hpp
+		   includes/Routing.hpp \
+		   includes/response/Response.hpp
+		   
 CC = c++
 CFLAGS = -Wall -Wextra -Werror -std=c++98 -g3 -I includes
 
