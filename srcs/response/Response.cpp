@@ -77,20 +77,19 @@ std::string Response::_readFile(const std::string& filepath)
 std::string Response::_CreateResponse(int code, const std::string& body)
 {
     std::string status;
-    if (code == 200) status = "200 OK";// new
-	else if (code == 201) status = "201 Created";// new
-	else if (code == 204) status = "204 No Content"; // new
+    if (code == 200) status = "200 OK";
+	else if (code == 201) status = "201 Created";
+	else if (code == 204) status = "204 No Content";
     else if (code == 404) status = "404 Not Found";
     else if (code == 403) status = "403 Forbidden";
     else if (code == 405) status = "405 Method Not Allowed";
     else if (code == 500) status = "500 Internal Server Error";
     else status = "500 Internal Server Error";
-    //add les autre code de status
     std::ostringstream res;
     res << "HTTP/1.1 " << status << "\r\n";
     res << "Content-Type: text/html\r\n";
     res << "Content-Length: " << body.size() << "\r\n";
-    res << "\r\n";   // ligne vide obligatoire
+    res << "\r\n";
     res << body;
     return (res.str());
 }
@@ -102,7 +101,6 @@ std::string Response::_ErrorPageResponse(int code)
     {
         std::string filepath = _server.errorPage[code];
         std::string body = _readFile("www" + filepath);
-		std::cerr << "repertoy" << "www" + filepath << std::endl;
         if (!body.empty())
             return (_CreateResponse(code, body));
     }
@@ -135,7 +133,6 @@ int Response::ArgsVerif()
 	
 	return 0;
 }
-
 
 std::string Response::_executeCgi()
 {
@@ -176,35 +173,6 @@ std::string Response::_executeCgi()
 	}
 }
 
-/*void ServerNetwork::handleGet(int fd, std::string url, Location loc)
-{
-    std::string extension = url.substr(url.find_last_of("."));
-    if (!loc.extensionCgi.empty() && extension == loc.extensionCgi)
-    {
-        executeCgi(fd, url, loc, "");
-        return ;
-    }
-    std::string body = getFile(loc, url);
-    if (body.empty())
-    {
-        std::ifstream errorFile("www/404.html");
-        std::stringstream ss;
-        ss << errorFile.rdbuf();
-        std::string errorBody = ss.str();
-        std::stringstream ss2;
-        ss2 << errorBody.size();
-        std::string response = "HTTP/1.1 404 Not Found\r\nContent-Length: " + ss2.str() + "\r\n\r\n" + errorBody;
-        send(fd, response.c_str(), response.size(), 0);
-    }
-    else
-    {
-        std::stringstream ss;
-        ss << body.size();
-        std::string contentLen = ss.str();
-        std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: " + contentLen + "\r\n\r\n" + body;
-        send(fd, response.c_str(), response.size(), 0);
-    }
-}*/
 void Response::build()
 {
 	if(ArgsVerif() == 1)
