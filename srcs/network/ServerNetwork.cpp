@@ -108,37 +108,11 @@ void ServerNetwork::handleClient(int fd)
     else
     {
         std::string request = std::string(buff, handleFd);
-        size_t first = request.find(" ");
-        size_t begin = first + 1;
-        size_t end = request.find(" ", begin);
-        std::string url = request.substr(begin, end - begin);
-        std::string method = request.substr(0, request.find(" "));
-        if (method == "GET")
-        {
-            Routing router;
-            Location loc = router.traitement(request, _server[0]);
-            handleGet(fd, url, loc); 
-        }
-        else if (method == "POST")
-        {
-            Routing router;
-            Location loc = router.traitement(request, _server[0]);
-            size_t start = request.find("\r\n\r\n");
-            std::string body = request.substr(start + 4);
-            handlePost(fd, url, body, loc);
-        }
-        else if (method == "DELETE")
-        {
-            Routing router;
-            Location loc = router.traitement(request, _server[0]);
-            handleDelete(fd, url, loc);
-        }
-        else
-        {
-            std::string response = "HTTP/1.1 405 Method not allowed\r\nContent-Length: 0\r\n\r\n";
-            send(fd, response.c_str(), response.size(), 0);
-        }
-
+		Routing router;
+		Location loc = router.traitement(request, _server[0]);
+		Response res(request, _server[0], loc);
+		res.build();
+		send(fd, res.get().c_str(), res.get().size(), 0);
     }
 }
 
@@ -155,122 +129,4 @@ void ServerNetwork::removeClient(int fd)
             }
             it++;
         }
-}
-
-std::string ServerNetwork::getFile(Location loc, std::string url)
-{
-    std::string filePath = loc.root + url;
-    if (url == "/")
-        filePath = loc.root + "/" + loc.fileIndex;
-    std::ifstream openFile(filePath.c_str());
-    if (!openFile.is_open())
-    {
-        std::cerr << "Error: could not open file"<< std::endl;
-        return ("");
-    }
-    std::stringstream ss;
-    ss << openFile.rdbuf();
-    return (ss.str());
-}
-
-void ServerNetwork::handleGet(int fd, std::string url, Location loc)
-{
-    std::string extension = url.substr(url.find_last_of("."));
-    if (!loc.extensionCgi.empty() && extension == loc.extensionCgi)
-    {
-        executeCgi(fd, url, loc, "");
-        return ;
-    }
-    std::string body = getFile(loc, url);
-    if (body.empty())
-    {
-        std::ifstream errorFile("www/404.html");
-        std::stringstream ss;
-        ss << errorFile.rdbuf();
-        std::string errorBody = ss.str();
-        std::stringstream ss2;
-        ss2 << errorBody.size();
-        std::string response = "HTTP/1.1 404 Not Found\r\nContent-Length: " + ss2.str() + "\r\n\r\n" + errorBody;
-        send(fd, response.c_str(), response.size(), 0);
-    }
-    else
-    {
-        std::stringstream ss;
-        ss << body.size();
-        std::string contentLen = ss.str();
-        std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: " + contentLen + "\r\n\r\n" + body;
-        send(fd, response.c_str(), response.size(), 0);
-    }
-}
-
-
-void ServerNetwork::handleDelete(int fd, std::string url, Location loc)
-{
-    std::string filePath = loc.root + url;
-    if (remove(filePath.c_str()) == 0)
-    {
-        std::string response = "HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n";
-        send(fd, response.c_str(), response.size(), 0);
-    }
-    else
-    {
-        std::string response = "HTTP/1.1 404 Not Found\r\nContent-Length: 0\r\n\r\n";
-        send(fd, response.c_str(), response.size(), 0);
-    }
-}
-
-void ServerNetwork::handlePost(int fd, std::string url, std::string request, Location loc)
-{
-    std::string fileName = url.substr(url.find_last_of("/") + 1);
-    std::string fileCreate = loc.uploadPath + "/" + fileName;
-    std::ofstream outFile(fileCreate.c_str());
-    if (!outFile.is_open())
-    {
-        std::cerr << "Error: could not open file" << std::endl;
-        return ;
-    }
-    outFile << request;
-    std::string response = "HTTP/1.1 201 Created\r\nContent-Length: 0\r\n\r\n";
-    send(fd, response.c_str(), response.size(), 0);
-}
-
-void ServerNetwork::executeCgi(int fd, std::string url, Location loc, std::string request)
-{
-    int pipefd[2];
-    if (pipe(pipefd) == -1)
-    {
-        std::cerr << "Error: pipe failed" << std::endl;
-        return ;
-    }
-    char buff[4096];
-    pid_t pid = fork();
-    if (pid == -1)
-    {
-        std::cerr << "Error: fork failed" << std::endl;
-        return ;
-    }
-    if (pid == 0)
-    {
-        dup2(pipefd[1], STDOUT_FILENO);
-        close(pipefd[0]);
-        close(pipefd[1]);
-        std::string scriptPath = loc.root + url;
-        char *arg[3];
-        arg[0] = (char *)"/usr/bin/python3";
-        arg[1] = (char *)scriptPath.c_str();
-        arg[2] = NULL;
-        execve("/usr/bin/python3", arg, NULL);
-    }
-    else
-    {
-        close(pipefd[1]);
-        waitpid(pid, NULL, 0);
-        ssize_t octets = read(pipefd[0], buff, sizeof(buff));
-        close(pipefd[0]);
-        std::string body = std::string(buff, octets);
-        std::stringstream ss;
-        ss << body.size();
-        std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: " + ss.str() + "\r\n\r\n" + body;
-        send(fd, response.c_str(), response.size(), 0);
-    }
 }
