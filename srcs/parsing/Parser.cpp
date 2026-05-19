@@ -50,6 +50,7 @@ Server Parser::parserServer(std::ifstream& readLine)
            break ;
         if (line[0] == '#')
             continue ;
+        //adel : fait attention t'as pas verif si la ligne elle est vide ou pas avant de faire les find ca peut faire crash si la ligne est vide
         if (line.find("listen") != std::string::npos)
         {
             size_t begin = line.find("listen") + 7;
