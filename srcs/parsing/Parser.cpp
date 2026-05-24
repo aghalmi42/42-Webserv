@@ -46,11 +46,12 @@ Server Parser::parserServer(std::ifstream& readLine)
     while(std::getline(readLine, line))
     {
         line = strTrim(line);
+        if (line.empty())
+            continue ;
          if (line == "}")
            break ;
         if (line[0] == '#')
             continue ;
-        //adel : fait attention t'as pas verif si la ligne elle est vide ou pas avant de faire les find ca peut faire crash si la ligne est vide
         if (line.find("listen") != std::string::npos)
         {
             size_t begin = line.find("listen") + 7;
@@ -105,6 +106,8 @@ Location Parser::parserLocation(std::ifstream& readLine, std::string pathLocatio
     while(std::getline(readLine, line))
     {
         line = strTrim(line);
+        if (line.empty())
+            continue ;
         if (line == "}")
             break ;
         if (line[0] == '#')

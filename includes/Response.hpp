@@ -11,6 +11,9 @@
 #include <algorithm>
 #include <unistd.h> 
 #include <sys/wait.h>
+#include <dirent.h>
+#include <ctime>
+#include <cstdlib>
 
 class Response
 {
@@ -20,6 +23,7 @@ class Response
 		std::string _response;
 		std::string _version;
 		std::string _body;
+		std::string _cookie;
 		std::string _executeCgi();
 		Server		_server;
 		Location 	_location;
@@ -28,6 +32,9 @@ class Response
 		std::string _readFile(const std::string& file);
 		std::string _CreateResponse(int code, const std::string& string);
 		std::string _ErrorPageResponse(int code);
+		std::string _getContentType();
+		std::string _generateSessionId();
+		void _handleCookies();
 
 	public:
 		Response(const std::string& request,const Server& config,const Location& location);

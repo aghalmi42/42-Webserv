@@ -1,1 +1,1 @@
-print("Content-Type: text/html\r\n\r\n<h1>Hello la team papa ours!!!!!!!!</h1>")
+print("Content-Type: text/html\r\n\r\n<html><body style='background:#1a1a2e;color:white'><h1>Hello CGI Python!</h1></body></html>")
