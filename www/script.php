@@ -1,0 +1,1 @@
+<?php echo "<html><body style='background:#1a1a2e;color:white'><h1>Hello CGI PHP!</h1></body></html>"; ?>

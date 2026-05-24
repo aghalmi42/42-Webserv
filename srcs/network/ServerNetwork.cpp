@@ -109,8 +109,8 @@ void ServerNetwork::handleClient(int fd)
     {
         std::string request = std::string(buff, handleFd);
 		Routing router;
-		Location loc = router.traitement(request, _server[0]);
-		Response res(request, _server[0], loc);
+		Location loc = router.traitement(request, getServer(request));
+		Response res(request, getServer(request), loc);
 		res.build();
 		send(fd, res.get().c_str(), res.get().size(), 0);
     }
@@ -129,4 +129,22 @@ void ServerNetwork::removeClient(int fd)
             }
             it++;
         }
+}
+
+Server ServerNetwork::getServer(std::string request)
+{
+    size_t hostPos = request.find("Host: ");
+    if (hostPos == std::string::npos)
+        return (_server[0]);
+    size_t begin = hostPos + 6;
+    size_t end = request.find("\r\n", begin);
+    std::string host = request.substr(begin, end - begin);
+    std::vector<Server>::iterator it = _server.begin();
+    while (it != _server.end())
+    {
+        if (it->serverName == host)
+            return (*it);
+        it++;
+    }
+    return (_server[0]);
 }

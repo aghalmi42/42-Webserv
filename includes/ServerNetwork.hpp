@@ -28,6 +28,7 @@ class ServerNetwork
     std::vector<struct pollfd> _fds;
     void handleClient(int fd);
     void removeClient(int fd);
+    Server getServer(std::string request);
 
     public:
     ServerNetwork(std::vector<Server> server);
