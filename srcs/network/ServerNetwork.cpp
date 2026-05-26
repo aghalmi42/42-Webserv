@@ -53,7 +53,7 @@ void ServerNetwork::run()
         this->_fds.push_back(pfd);
         itt++;
     }
-    while(true)
+    while(ServerNetwork::_running)
     {
         int returN = poll(this->_fds.data(), this->_fds.size(), -1);
         if (returN == -1)
@@ -147,4 +147,23 @@ Server ServerNetwork::getServer(std::string request)
         it++;
     }
     return (_server[0]);
+}
+
+
+bool ServerNetwork::_running = true;
+
+void ServerNetwork::stop()
+{
+    std::vector<int>::iterator it = _socket.begin();
+    while (it != _socket.end())
+    {
+        close(*it);
+        it++;
+    }
+    std::vector<struct pollfd>::iterator itfd = _fds.begin();
+    while (itfd != _fds.end())
+    {
+        close(itfd->fd);
+        itfd++;
+    }
 }

@@ -1,6 +1,17 @@
 
 #include "../includes/Parser.hpp"
 #include "../includes/ServerNetwork.hpp"
+#include <csignal>
+
+ServerNetwork *g_network = NULL;
+
+void signalHandler(int sig)
+{
+    (void)sig;
+    if (g_network)
+        g_network->stop();
+    ServerNetwork::_running = false;
+}
 
 int main(int ac, char **av)
 {
@@ -10,6 +21,8 @@ int main(int ac, char **av)
         return (1);
     }
 
+    signal(SIGINT, signalHandler);
+    signal(SIGTERM, signalHandler);
     Parser p(av[1]);
     std::vector<Server> server = p.parse();
     if (server.empty())
@@ -19,6 +32,7 @@ int main(int ac, char **av)
     }
     
     ServerNetwork network(server);
+    g_network = &network;
     network.run();
 
     return (0);

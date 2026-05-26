@@ -36,6 +36,8 @@ class ServerNetwork
     ServerNetwork(const ServerNetwork& src);
     ServerNetwork& operator=(const ServerNetwork& src);
     void run();
+    static bool _running;
+    void stop();
 };
 
 #endif
